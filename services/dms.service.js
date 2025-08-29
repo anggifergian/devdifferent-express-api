@@ -7,7 +7,7 @@ async function generateUploadUrl(filename, mimetype) {
   const key = `uploads/${Date.now()}-${filename}`;
 
   const command = new PutObjectCommand({
-    Bucket: process.env.AWS_S3_BUCKET,
+    Bucket: process.env.STORAGE_BUCKET_NAME,
     Key: key,
     ContentType: mimetype,
   });
@@ -19,7 +19,7 @@ async function generateUploadUrl(filename, mimetype) {
 
 async function generateDownloadUrl(fileName) {
   const command = new GetObjectCommand({
-    Bucket: process.env.AWS_S3_BUCKET,
+    Bucket: process.env.STORAGE_BUCKET_NAME,
     Key: fileName,
   });
 
