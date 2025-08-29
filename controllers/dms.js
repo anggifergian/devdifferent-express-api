@@ -4,6 +4,7 @@ const multer = require('multer');
 
 const { generateUploadUrl, generateDownloadUrl } = require('../services/dms.service');
 const File = require('../models/File');
+const CustomError = require('../utils/customError');
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -24,11 +25,36 @@ router.post('/upload', upload.single('file'), async (req, res, next) => {
 
     const { url, key } = await generateUploadUrl(filename, mimetype);
 
-    // Save metadata to MongoDB
-    const newFile = new File({ filename, s3Key: key });
-    await newFile.save();
+    const reqUpload = await fetch(url, {
+      method: 'PUT',
+      headers: { 'Content-Type': file.mimetype },
+      body: file.buffer,
+    });
 
-    res.json({ url, fileId: newFile._id });
+    const statusCode = reqUpload.status;
+
+    if (statusCode === 200) {
+      const newFile = new File({ filename, s3Key: key });
+      await newFile.save();
+
+      res.json({ uploadUrl: url, fileId: newFile._id });
+    } else {
+      let errMessage = '';
+
+      switch (statusCode) {
+        case 413:
+          errMessage = 'FILE_TOO_LARGE';
+          break;
+        case 415:
+          errMessage = 'INVALID_FILE_TYPE';
+          break;
+        default:
+          errMessage = 'Internal server error';
+          break;
+      }
+
+      throw new CustomError(errMessage, statusCode);
+    }
   } catch (err) {
     next(err);
   }
