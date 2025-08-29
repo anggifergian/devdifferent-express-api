@@ -60,6 +60,30 @@ router.post('/upload', upload.single('file'), async (req, res, next) => {
   }
 });
 
+router.get('/get-all', async (req, res, next) => {
+  try {
+    const files = await File.find().sort({ uploadedAt: -1 });
+
+    const result = await Promise.all(
+      files.map(async (file) => {
+        const downloadUrl = await generateDownloadUrl(file.s3Key);
+
+        return {
+          fileId: file._id,
+          filename: file.filename,
+          s3Key: file.s3Key,
+          uploadDate: file.uploadedAt,
+          downloadUrl,
+        };
+      })
+    );
+
+    res.json({ data: result });
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.get('/download', async (req, res, next) => {
   try {
     const file = await File.findById(req.query.id);
