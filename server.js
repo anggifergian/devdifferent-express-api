@@ -1,5 +1,9 @@
+require('dotenv').config();
 const express = require('express');
 const logger = require('./utils/logger');
+
+logger.info('Mongo URI:', process.env.MONGO_URI);
+logger.info('S3 Bucket:', process.env.AWS_S3_BUCKET);
 
 const app = express();
 
