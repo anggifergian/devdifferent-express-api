@@ -5,8 +5,12 @@ services:
     ports:
       - "9000:9000"
     environment:
-      - NODE_ENV=development
-      - MONGO_URI=mongodb://db:27017/devdifferent
+      - NODE_ENV=${NODE_ENV}
+      - MONGO_URI=${MONGO_URI}
+      - AWS_REGION=${AWS_REGION}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_S3_BUCKET=${AWS_S3_BUCKET}
     depends_on:
       - db
     volumes:
