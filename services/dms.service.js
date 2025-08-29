@@ -17,7 +17,7 @@ async function generateUploadUrl(filename, mimetype) {
   return { url, key };
 }
 
-async function generateDownloadUrl() {
+async function generateDownloadUrl(fileName) {
   const command = new GetObjectCommand({
     Bucket: process.env.AWS_S3_BUCKET,
     Key: fileName,

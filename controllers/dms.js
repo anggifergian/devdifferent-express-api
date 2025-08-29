@@ -23,7 +23,6 @@ router.post('/upload', upload.single('file'), async (req, res, next) => {
     const { originalname: filename, mimetype } = file;
 
     const { url, key } = await generateUploadUrl(filename, mimetype);
-    console.log('ANGGI', { url, key });
 
     // Save metadata to MongoDB
     const newFile = new File({ filename, s3Key: key });
@@ -35,9 +34,9 @@ router.post('/upload', upload.single('file'), async (req, res, next) => {
   }
 });
 
-router.get('/download', async (req, res) => {
+router.get('/download', async (req, res, next) => {
   try {
-    const file = await File.findById(req.params.id);
+    const file = await File.findById(req.query.id);
     if (!file) return res.status(404).send('File not found');
 
     const downloadUrl = await generateDownloadUrl(file.s3Key);

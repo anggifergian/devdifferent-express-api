@@ -5,7 +5,7 @@ module.exports = async function () {
   try {
     mongoose.set('strictQuery', false);
 
-    const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/mydb';
+    const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/devdifferent';
     await mongoose.connect(mongoUri);
 
     logger.info(`✅ Connected to MongoDB at ${mongoUri}`);
