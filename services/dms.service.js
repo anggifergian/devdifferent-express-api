@@ -1,5 +1,5 @@
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
-const { PutObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
+const { PutObjectCommand, GetObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
 
 const s3 = require('../utils/s3');
 
@@ -28,4 +28,13 @@ async function generateDownloadUrl(fileName) {
   return url;
 }
 
-module.exports = { generateUploadUrl, generateDownloadUrl };
+function deleteS3Object(fileName) {
+  const command = new DeleteObjectCommand({
+    Bucket: process.env.STORAGE_BUCKET_NAME,
+    Key: fileName,
+  });
+
+  return s3.send(command);
+}
+
+module.exports = { generateUploadUrl, generateDownloadUrl, deleteS3Object };

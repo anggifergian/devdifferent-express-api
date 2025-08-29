@@ -2,7 +2,11 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 
-const { generateUploadUrl, generateDownloadUrl } = require('../services/dms.service');
+const {
+  generateUploadUrl,
+  generateDownloadUrl,
+  deleteS3Object,
+} = require('../services/dms.service');
 const File = require('../models/File');
 const CustomError = require('../utils/customError');
 
@@ -93,6 +97,24 @@ router.get('/download', async (req, res, next) => {
     res.json({ downloadUrl });
   } catch (err) {
     next(err);
+  }
+});
+
+router.delete('/:id', async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    if (!id) return res.status(400).json({ error: 'File key is required' });
+
+    const file = await File.findById(id);
+    if (!file) return res.status(404).json({ error: 'File not found' });
+
+    await deleteS3Object(file.s3Key);
+
+    await File.findByIdAndDelete(id);
+
+    res.json({ message: 'File deleted successfully' });
+  } catch (error) {
+    next(error);
   }
 });
 
